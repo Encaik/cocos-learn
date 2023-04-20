@@ -1,6 +1,7 @@
 {
-  "name": "brotato",
+  "name": "cocos-learn",
   "uuid": "43e5909d-252f-4b47-af82-b908f6503e46",
+  "version": "0.0.1",
   "creator": {
     "version": "3.7.2"
   },
