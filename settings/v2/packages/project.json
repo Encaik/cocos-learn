@@ -13,6 +13,10 @@
       {
         "index": 4,
         "name": "player"
+      },
+      {
+        "index": 5,
+        "name": "drop"
       }
     ],
     "collisionMatrix": {
@@ -20,7 +24,8 @@
       "1": 4,
       "2": 26,
       "3": 4,
-      "4": 4
+      "4": 36,
+      "5": 16
     }
   },
   "custom_joint_texture_layouts": []

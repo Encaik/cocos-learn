@@ -13,6 +13,7 @@ export class Game extends Component {
 
   start (): void {
     this.isStart = true;
+    eventTarget.emit('start');
   }
 
   onLoad (): void {
@@ -32,7 +33,10 @@ export class Game extends Component {
 
   update (deltaTime: number): void {
     const curTime = new Date().getTime();
-    if (this.isStart && curTime - this.time > 300 && this.node.children.length < 51) {
+    if (this.isStart &&
+      curTime - this.time > 300 &&
+      this.node.children.filter(node => node.name === 'slime').length < 51
+    ) {
       this.generateSlime();
       this.time = curTime;
     }

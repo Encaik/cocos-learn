@@ -12,7 +12,10 @@ export class Player extends Component {
   private readonly rect = view.getVisibleSize();
 
   start (): void {
-
+    eventTarget.on('over', () => {
+      this.node.destroy();
+      director.loadScene('over');
+    }, this);
   }
 
   onLoad (): void {
@@ -69,11 +72,13 @@ export class Player extends Component {
     if (other.node.name === 'slime') {
       const health = find('Canvas/health').getComponent(ProgressBar);
       health.progress -= 0.1;
-      if (health.progress < 0) {
+      if (health.progress <= 0) {
         eventTarget.emit('over');
-        this.node.destroy();
-        director.loadScene('over');
       }
+    } else if (other.node.name === 'drop') {
+      const health = find('Canvas/health').getComponent(ProgressBar);
+      health.progress += 0.1;
+      other.node.destroy();
     }
   }
 

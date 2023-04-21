@@ -1,10 +1,13 @@
-import { _decorator, Collider2D, Component, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, Sprite, SpriteFrame, find, Vec3 } from 'cc';
+import { _decorator, Collider2D, Component, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, Sprite, SpriteFrame, find, Vec3, Prefab, instantiate } from 'cc';
 import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
 @ccclass('Master')
 export class Master extends Component {
   @property(SpriteFrame)
     slimeImg: SpriteFrame = null;
+
+  @property(Prefab)
+  public drop: Prefab = null;
 
   private player = null;
   private isSlime = false;
@@ -37,6 +40,9 @@ export class Master extends Component {
     if (other.node.name === 'bullet') {
       self.node.destroy();
       other.node.destroy();
+      const node = instantiate(this.drop);
+      node.parent = this.node.parent;
+      node.setPosition(this.node.position.clone());
     }
   }
 
