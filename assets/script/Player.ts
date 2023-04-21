@@ -1,6 +1,6 @@
-import { _decorator, Component, Input, input, type EventKeyboard, Vec3, view, Collider2D, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, find, ProgressBar, director } from 'cc';
+import { _decorator, Component, Input, input, type EventKeyboard, Vec3, view, Collider2D, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, find, ProgressBar, director, Prefab, instantiate } from 'cc';
 import eventTarget from './utils/eventTarget';
-const { ccclass } = _decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass('player')
 export class Player extends Component {
@@ -11,14 +11,21 @@ export class Player extends Component {
   private speed: number = 0;
   private readonly rect = view.getVisibleSize();
 
-  start (): void {
-    eventTarget.on('over', () => {
-      this.node.destroy();
-      director.loadScene('over');
-    }, this);
-  }
+  @property(Prefab)
+  public gun: Prefab = null;
 
   onLoad (): void {
+    eventTarget.on('start', () => {
+      Array.from({ length: 2 }).forEach((_, idx) => {
+        const node = instantiate(this.gun);
+        node.parent = this.node;
+        if (idx === 0)node.setPosition(-40, 0);
+        if (idx === 1)node.setPosition(40, 0);
+      });
+    }, this);
+    eventTarget.on('over', () => {
+      director.loadScene('over');
+    }, this);
     input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
     PhysicsSystem2D.instance.enable = true;
@@ -27,6 +34,10 @@ export class Player extends Component {
     if (collider) {
       collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
+  }
+
+  start (): void {
+
   }
 
   onDestroy (): void {

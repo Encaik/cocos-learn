@@ -1,5 +1,4 @@
 import { _decorator, Collider2D, Component, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, Sprite, SpriteFrame, find, Vec3, Prefab, instantiate } from 'cc';
-import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
 @ccclass('Master')
 export class Master extends Component {
@@ -13,9 +12,6 @@ export class Master extends Component {
   private isSlime = false;
 
   start (): void {
-    eventTarget.on('over', () => {
-      this.node.destroy();
-    }, this);
     this.player = find('Canvas/default_bg/player');
     const sprite = this.node.getComponent(Sprite);
     setTimeout(() => {

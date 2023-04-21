@@ -11,16 +11,17 @@ export class Game extends Component {
   private time = 0;
   private isStart = false;
 
-  start (): void {
-    this.isStart = true;
-    eventTarget.emit('start');
-  }
-
   onLoad (): void {
+    this.isStart = true;
     this.time = new Date().getTime();
     eventTarget.on('over', () => {
       this.isStart = false;
+      this.node.children.forEach(node => node.destroy());
     }, this);
+  }
+
+  start (): void {
+    eventTarget.emit('start');
   }
 
   generateSlime (): void {
