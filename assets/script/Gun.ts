@@ -1,4 +1,5 @@
-import { _decorator, Component, instantiate, type Node, Prefab, find, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, type Node, Prefab, find, Vec3, tween } from 'cc';
+import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
 
 @ccclass('Gun')
@@ -7,13 +8,17 @@ export class Gun extends Component {
   public bullet: Prefab = null;
 
   private player: Node = null;
+  private interval = null;
 
   start (): void {
     this.player = find('Canvas/default_bg/player');
+    eventTarget.on('over', () => {
+      this.node.destroy();
+    }, this);
   }
 
   onLoad (): void {
-    setInterval(() => {
+    this.interval = setInterval(() => {
       const slimeNodes = this.node.parent.parent.children.filter(node => node.name === 'slime' && node.isValid);
 
       let closestSlimeNode = null;
@@ -29,10 +34,16 @@ export class Gun extends Component {
 
       if (closestSlimeNode) {
         const direction = closestSlimeNode.position.clone().subtract(gunPos).normalize();
-        this.node.angle = Math.atan2(direction.y, direction.x) * 180 / Math.PI + 180;
+        tween(this.node)
+          .to(0.3, { angle: Math.atan2(direction.y, direction.x) * 180 / Math.PI + 180 })
+          .start();
         this.onFire();
       }
     }, 300);
+  }
+
+  onDestroy (): void {
+    clearInterval(this.interval);
   }
 
   onFire (): void {

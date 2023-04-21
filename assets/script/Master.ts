@@ -1,6 +1,6 @@
 import { _decorator, Collider2D, Component, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, Sprite, SpriteFrame, find, Vec3 } from 'cc';
+import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
-
 @ccclass('Master')
 export class Master extends Component {
   @property(SpriteFrame)
@@ -10,16 +10,21 @@ export class Master extends Component {
   private isSlime = false;
 
   start (): void {
+    eventTarget.on('over', () => {
+      this.node.destroy();
+    }, this);
     this.player = find('Canvas/default_bg/player');
-    const sprite = this.node.getComponents(Sprite)[0];
+    const sprite = this.node.getComponent(Sprite);
     setTimeout(() => {
       sprite.spriteFrame = this.slimeImg;
       this.isSlime = true;
       PhysicsSystem2D.instance.enable = true;
       // 注册单个碰撞体的回调函数
-      const collider = this.getComponent(Collider2D);
-      if (collider) {
-        collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+      if (this.node) {
+        const collider = this.node.getComponent(Collider2D);
+        if (collider) {
+          collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+        }
       }
     }, 1000);
   }
@@ -29,10 +34,10 @@ export class Master extends Component {
   }
 
   onBeginContact (self: Collider2D, other: Collider2D, contact: IPhysics2DContact | null): void {
-    setTimeout(() => {
+    if (other.node.name === 'bullet') {
       self.node.destroy();
       other.node.destroy();
-    });
+    }
   }
 
   update (deltaTime: number): void {

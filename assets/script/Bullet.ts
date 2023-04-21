@@ -1,4 +1,5 @@
 import { _decorator, Component, toRadian, view } from 'cc';
+import eventTarget from './utils/eventTarget';
 const { ccclass } = _decorator;
 
 @ccclass('Bullet')
@@ -6,7 +7,9 @@ export class Bullet extends Component {
   private readonly rect = view.getVisibleSize();
 
   start (): void {
-
+    eventTarget.on('over', () => {
+      this.node.destroy();
+    }, this);
   }
 
   update (deltaTime: number): void {

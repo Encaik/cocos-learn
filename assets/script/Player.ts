@@ -1,4 +1,5 @@
-import { _decorator, Component, Input, input, type EventKeyboard, Vec3, view } from 'cc';
+import { _decorator, Component, Input, input, type EventKeyboard, Vec3, view, Collider2D, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, find, ProgressBar, director } from 'cc';
+import eventTarget from './utils/eventTarget';
 const { ccclass } = _decorator;
 
 @ccclass('player')
@@ -17,6 +18,12 @@ export class Player extends Component {
   onLoad (): void {
     input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
     input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
+    PhysicsSystem2D.instance.enable = true;
+    // 注册单个碰撞体的回调函数
+    const collider = this.getComponent(Collider2D);
+    if (collider) {
+      collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    }
   }
 
   onDestroy (): void {
@@ -55,6 +62,18 @@ export class Player extends Component {
       case 68:
         this.isRight = false;
         break;
+    }
+  }
+
+  onBeginContact (self: Collider2D, other: Collider2D, contact: IPhysics2DContact | null): void {
+    if (other.node.name === 'slime') {
+      const health = find('Canvas/health').getComponent(ProgressBar);
+      health.progress -= 0.1;
+      if (health.progress < 0) {
+        eventTarget.emit('over');
+        this.node.destroy();
+        director.loadScene('over');
+      }
     }
   }
 

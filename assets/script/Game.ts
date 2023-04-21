@@ -1,4 +1,5 @@
 import { _decorator, Component, instantiate, Prefab, view } from 'cc';
+import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
 
 @ccclass('Game')
@@ -8,13 +9,17 @@ export class Game extends Component {
 
   private readonly rect = view.getVisibleSize();
   private time = 0;
+  private isStart = false;
 
   start (): void {
-
+    this.isStart = true;
   }
 
   onLoad (): void {
     this.time = new Date().getTime();
+    eventTarget.on('over', () => {
+      this.isStart = false;
+    }, this);
   }
 
   generateSlime (): void {
@@ -27,7 +32,7 @@ export class Game extends Component {
 
   update (deltaTime: number): void {
     const curTime = new Date().getTime();
-    if (curTime - this.time > 1000 && this.node.children.length < 11) {
+    if (this.isStart && curTime - this.time > 300 && this.node.children.length < 51) {
       this.generateSlime();
       this.time = curTime;
     }
