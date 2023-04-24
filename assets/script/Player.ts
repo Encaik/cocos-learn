@@ -1,4 +1,4 @@
-import { _decorator, Component, Input, input, type EventKeyboard, Vec3, view, Collider2D, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, find, ProgressBar, director, Prefab, instantiate } from 'cc';
+import { _decorator, Component, Animation, Input, input, type EventKeyboard, Vec3, view, Collider2D, Contact2DType, type IPhysics2DContact, PhysicsSystem2D, find, ProgressBar, director, Prefab, instantiate, Label } from 'cc';
 import eventTarget from './utils/eventTarget';
 const { ccclass, property } = _decorator;
 
@@ -10,6 +10,8 @@ export class Player extends Component {
   private isDown: boolean = false;
   private speed: number = 0;
   private readonly rect = view.getVisibleSize();
+  private animation = null;
+  private level: number = 0;
 
   @property(Prefab)
   public gun: Prefab = null;
@@ -34,6 +36,7 @@ export class Player extends Component {
     if (collider) {
       collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
     }
+    this.animation = this.getComponent(Animation);
   }
 
   start (): void {
@@ -46,6 +49,8 @@ export class Player extends Component {
   }
 
   onKeyDown (event: EventKeyboard): void {
+    const walkState = this.animation.getState('player_walk');
+    if (walkState.isMotionless) this.animation.play('player_walk');
     switch (event.keyCode) {
       case 87:
         this.isUp = true;
@@ -77,18 +82,30 @@ export class Player extends Component {
         this.isRight = false;
         break;
     }
+    const walkState = this.animation.getState('player_walk');
+    if (!this.isUp &&
+      !this.isLeft &&
+      !this.isDown &&
+      !this.isRight && walkState.isPlaying
+    ) this.animation.stop('player_walk');
   }
 
   onBeginContact (self: Collider2D, other: Collider2D, contact: IPhysics2DContact | null): void {
     if (other.node.name === 'slime') {
-      const health = find('Canvas/health').getComponent(ProgressBar);
+      const health = find('Canvas/ui/health').getComponent(ProgressBar);
       health.progress -= 0.1;
       if (health.progress <= 0) {
         eventTarget.emit('over');
       }
     } else if (other.node.name === 'drop') {
-      const health = find('Canvas/health').getComponent(ProgressBar);
-      health.progress += 0.1;
+      const experienceBar = find('Canvas/ui/experience').getComponent(ProgressBar);
+      experienceBar.progress += 0.1;
+      if (experienceBar.progress >= 1) {
+        this.level++;
+        const label = find('Canvas/ui/experience/Label').getComponent(Label);
+        label.string = `Lv.${this.level}`;
+        experienceBar.progress = 0;
+      }
       other.node.destroy();
     }
   }
