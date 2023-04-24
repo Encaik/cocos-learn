@@ -21,8 +21,8 @@ export class Player extends Component {
       Array.from({ length: 2 }).forEach((_, idx) => {
         const node = instantiate(this.gun);
         node.parent = this.node;
-        if (idx === 0)node.setPosition(-40, 0);
-        if (idx === 1)node.setPosition(40, 0);
+        if (idx === 0)node.setPosition(-50, 0);
+        if (idx === 1)node.setPosition(50, 0);
       });
     }, this);
     eventTarget.on('over', () => {

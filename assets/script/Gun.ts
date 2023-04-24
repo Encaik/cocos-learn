@@ -10,8 +10,12 @@ export class Gun extends Component {
   private player: Node = null;
   private interval = null;
 
+  gameProperty = {
+    fireSpace: 200
+  };
+
   start (): void {
-    this.player = find('Canvas/default_bg/player');
+    this.player = find('Canvas/player');
     eventTarget.on('over', () => {
       this.node.destroy();
     }, this);
@@ -19,8 +23,7 @@ export class Gun extends Component {
 
   onLoad (): void {
     this.interval = setInterval(() => {
-      const slimeNodes = this.node.parent.parent.children.filter(node => node.name === 'slime' && node.isValid);
-
+      const slimeNodes = find('Canvas/slimes').children;
       let closestSlimeNode = null;
       let closestDistance = 1000;
       const gunPos = this.player.position.clone().add(this.node.position.clone());
@@ -35,11 +38,11 @@ export class Gun extends Component {
       if (closestSlimeNode) {
         const direction = closestSlimeNode.position.clone().subtract(gunPos).normalize();
         tween(this.node)
-          .to(0.3, { angle: Math.atan2(direction.y, direction.x) * 180 / Math.PI + 180 })
+          .to(0.3, { angle: Math.atan2(direction.y, direction.x) * 180 / Math.PI })
           .start();
         this.onFire();
       }
-    }, 300);
+    }, this.gameProperty.fireSpace);
   }
 
   onDestroy (): void {
@@ -53,7 +56,7 @@ export class Gun extends Component {
       this.player.position.x + this.node.position.x,
       this.player.position.y + this.node.position.y
     );
-    bullet.angle = this.node.angle + 90;
+    bullet.angle = this.node.angle;
   }
 
   update (deltaTime: number): void {

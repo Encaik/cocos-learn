@@ -18,7 +18,7 @@ export class Bullet extends Component {
       this.node.destroy();
       return;
     }
-    const arc = toRadian(this.node.angle + 90);
+    const arc = toRadian(this.node.angle);
     const x = 50 * Math.cos(arc);
     const y = 50 * Math.sin(arc);
     this.node.setPosition(

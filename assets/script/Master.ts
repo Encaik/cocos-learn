@@ -12,7 +12,7 @@ export class Master extends Component {
   private isSlime = false;
 
   start (): void {
-    this.player = find('Canvas/default_bg/player');
+    this.player = find('Canvas/player');
     const sprite = this.node.getComponent(Sprite);
     setTimeout(() => {
       sprite.spriteFrame = this.slimeImg;
